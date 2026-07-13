@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Mac Has Been an AI Lab This Whole Time</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a0a;--surface:#141414;--surface2:#1a1a1a;--text:#f0f0f0;
+    --muted:#888;--accent:#F5A623;--accent2:#e8943a;
+    --border:rgba(255,255,255,.06);--radius:24px;
+    --green:#7dd47d;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;
+    background:#050505;color:var(--text);overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ── Nav ── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+    background:rgba(5,5,5,.6);border-bottom:1px solid var(--border);
+    transition:transform .35s ease;
+  }
+  nav.hidden{transform:translateY(-100%)}
+  .nav-inner{
+    max-width:1200px;margin:0 auto;display:flex;align-items:center;
+    justify-content:space-between;padding:16px 32px;
+  }
+  .nav-logo{font-weight:700;font-size:1.1rem;letter-spacing:-.02em;color:var(--text)}
+  .nav-logo span{color:var(--accent)}
+  .nav-links{display:flex;gap:8px}
+  .nav-links a{
+    text-decoration:none;color:var(--muted);font-size:.875rem;font-weight:500;
+    padding:8px 16px;border-radius:10px;transition:all .25s ease;
+  }
+  .nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+
+  /* ── Sticky card sections ── */
+  .card-section{
+    position:sticky;top:0;
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:80px 32px;
+    will-change:transform;
+  }
+  .card-section .card-bg{
+    position:absolute;inset:0;
+    border-radius:0;
+    transition:border-radius .4s ease;
+  }
+  .card-section .card-content{
+    position:relative;z-index:2;
+    max-width:1200px;width:100%;margin:0 auto;
+  }
+
+  /* Section 1: Hero */
+  .card-hero{z-index:1}
+  .card-hero .card-bg{background:var(--bg)}
+  .card-hero .card-content{
+    text-align:center;
+    display:flex;flex-direction:column;align-items:center;
+  }
+
+  /* Section 2: Presenters */
+  .card-presenters{z-index:2}
+  .card-presenters .card-bg{
+    background:var(--surface);
+    box-shadow:0 -20px 80px rgba(0,0,0,.5);
+  }
+
+  /* Section 3: Feedback */
+  .card-feedback{z-index:3}
+  .card-feedback .card-bg{
+    background:var(--surface2);
+    box-shadow:0 -20px 80px rgba(0,0,0,.5);
+  }
+
+  /* Scale-down effect on scroll for cards behind */
+  .card-section.scaled .card-bg{
+    border-radius:24px;
+  }
+
+  /* ── Hero styles ── */
+  .hero-content{
+    will-change:transform,opacity;
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+  }
+  .hero h1{
+    font-size:clamp(2.8rem,7vw,5.2rem);font-weight:800;letter-spacing:-.04em;
+    line-height:1;max-width:900px;
+  }
+  .hero h1 .gradient{
+    background:linear-gradient(135deg,var(--accent),#e8943a,#f0c060);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-size:200% 200%;animation:shimmer 5s ease infinite;
+  }
+  @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .hero .subtitle{
+    margin-top:20px;font-size:1.15rem;color:var(--accent);font-weight:500;
+  }
+  .hero p.desc{
+    margin-top:16px;font-size:1.1rem;color:var(--muted);max-width:540px;
+    line-height:1.65;
+  }
+  .hero-cta{
+    display:flex;gap:16px;margin-top:48px;flex-wrap:wrap;justify-content:center;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;padding:16px 32px;
+    border-radius:14px;font-size:.95rem;font-weight:600;text-decoration:none;
+    transition:all .3s cubic-bezier(.16,1,.3,1);cursor:pointer;border:none;
+  }
+  .btn-primary{
+    background:var(--accent);color:#0a0a0a;
+    box-shadow:0 4px 24px rgba(245,166,35,.25);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(245,166,35,.35)}
+  .scroll-indicator{
+    position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;
+    align-items:center;gap:8px;color:var(--muted);font-size:.7rem;
+    letter-spacing:.1em;text-transform:uppercase;animation:float 3s ease infinite;
+    font-family:"SF Mono",monospace;z-index:2;
+  }
+  @keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+  .scroll-indicator svg{width:20px;height:20px;stroke:var(--muted)}
+
+  /* ── Section labels ── */
+  .section-label{
+    font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:16px;
+    font-family:"SF Mono",monospace;
+  }
+  .section-title{
+    font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.03em;
+    line-height:1.1;margin-bottom:16px;color:var(--text);
+  }
+  .section-subtitle{font-size:1.05rem;color:var(--muted);max-width:560px;line-height:1.6}
+
+  /* ── Reveal animation ── */
+  .reveal{
+    opacity:0;transform:translateY(50px);
+    transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.visible{opacity:1;transform:translateY(0)}
+  .reveal-delay-1{transition-delay:.15s}
+  .reveal-delay-2{transition-delay:.3s}
+
+  /* ── Presenters ── */
+  .presenters-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:32px;margin-top:56px;
+  }
+  .presenter-card{
+    background:rgba(255,255,255,.03);border-radius:var(--radius);padding:48px 40px;
+    border:1px solid var(--border);position:relative;overflow:hidden;
+    transition:all .4s cubic-bezier(.16,1,.3,1);
+  }
+  .presenter-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),#f0c060);
+    transform:scaleX(0);transform-origin:left;transition:transform .4s ease;
+  }
+  .presenter-card:hover{transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,.4)}
+  .presenter-card:hover::before{transform:scaleX(1)}
+  .presenter-avatar{
+    width:72px;height:72px;border-radius:50%;margin-bottom:24px;
+    background:linear-gradient(135deg,var(--accent),#f0c060);
+    object-fit:cover;
+    border:2px solid rgba(245,166,35,.3);
+  }
+  .presenter-card h3{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
+  .presenter-card .role{color:var(--accent);font-size:.85rem;font-weight:600;margin-top:4px}
+  .presenter-card .edu{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .presenter-card .bio{color:var(--muted);font-size:.92rem;line-height:1.6;margin-top:16px}
+  .presenter-links{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+  .presenter-links a{
+    display:inline-flex;align-items:center;gap:6px;font-size:.82rem;
+    font-weight:600;color:var(--muted);text-decoration:none;
+    padding:8px 16px;border-radius:10px;border:1px solid var(--border);
+    transition:all .25s ease;
+  }
+  .presenter-links a:hover{color:var(--accent);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)}
+  .presenter-links a svg{width:16px;height:16px}
+
+  /* ── Forms ── */
+  .forms-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:32px;margin-top:56px;
+  }
+  .form-card{
+    background:rgba(255,255,255,.03);border-radius:var(--radius);padding:48px 40px;
+    border:1px solid var(--border);text-align:center;
+    transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;
+  }
+  .form-card:hover{transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,.4)}
+  .form-icon{
+    width:72px;height:72px;border-radius:20px;margin:0 auto 24px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .form-icon.feedback{background:rgba(245,166,35,.1)}
+  .form-icon.qa{background:rgba(125,212,125,.1)}
+  .form-icon svg{width:32px;height:32px}
+  .form-card h3{font-size:1.3rem;font-weight:700;letter-spacing:-.02em}
+  .form-card p{color:var(--muted);font-size:.92rem;line-height:1.6;margin-top:12px}
+  .form-card .btn{margin-top:32px;width:100%;justify-content:center}
+  .form-card .btn.feedback-btn{
+    background:var(--accent);color:#0a0a0a;
+    box-shadow:0 4px 24px rgba(245,166,35,.2);
+  }
+  .form-card .btn.feedback-btn:hover{box-shadow:0 8px 36px rgba(245,166,35,.3)}
+  .form-card .btn.qa-btn{
+    background:var(--green);color:#0a0a0a;
+    box-shadow:0 4px 24px rgba(125,212,125,.15);
+  }
+  .form-card .btn.qa-btn:hover{box-shadow:0 8px 36px rgba(125,212,125,.25)}
+
+  /* ── Responsive ── */
+  @media(max-width:768px){
+    .nav-links{display:none}
+    .card-section{padding:80px 20px}
+    .presenter-card,.form-card{padding:36px 28px}
+    .presenters-grid,.forms-grid{grid-template-columns:1fr}
+  }
+
+  /* ── Cursor glow ── */
+  .cursor-blob{
+    position:fixed;width:500px;height:500px;border-radius:50%;
+    background:radial-gradient(circle,rgba(245,166,35,.04),transparent 70%);
+    pointer-events:none;z-index:0;
+    transform:translate(-50%,-50%);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-blob" id="cursor-blob"></div>
+
+<!-- Nav -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo"><span>Bangalore Developer Day 2026</span></div>
+    <div class="nav-links">
+      <a href="#presenters">Presenters</a>
+      <a href="#connect">Feedback</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Card 1: Hero -->
+<section class="card-section card-hero" id="hero">
+  <div class="card-bg"></div>
+  <div class="card-content hero" style="text-align:center;display:flex;flex-direction:column;align-items:center">
+    <div class="hero-content" id="hero-content">
+      <h1>Your Mac Has Been<br>an <span class="gradient">AI Lab</span><br>This Whole Time</h1>
+      <div class="subtitle">Here's the Stack</div>
+      <p class="desc">Free, offline, and faster than cloud APIs for many tasks. Run LLMs and audio models locally on Apple Silicon with zero setup.</p>
+      <div class="hero-cta">
+        <a href="https://github.com/nkthakur48/mlx-podcast" class="btn btn-primary" target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Get Started with MLX
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    scroll
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+  </div>
+</section>
+
+<!-- Card 2: Presenters -->
+<section class="card-section card-presenters" id="presenters">
+  <div class="card-bg"></div>
+  <div class="card-content">
+    <div class="reveal">
+      <div class="section-label">Your Presenters</div>
+      <div class="section-title">Meet the speakers</div>
+      <div class="section-subtitle">Two engineers from Adobe building on-device AI with Apple Silicon.</div>
+    </div>
+    <div class="presenters-grid">
+      <div class="presenter-card reveal reveal-delay-1">
+        <img class="presenter-avatar" src="https://ui-avatars.com/api/?name=Nishant+Thakur&background=F5A623&color=0a0a0a&size=144&bold=true&font-size=0.4" alt="Nishant Thakur">
+        <h3>Nishant Thakur</h3>
+        <div class="role">Senior Computer Scientist, Adobe</div>
+        <div class="edu">MDS Deakin &middot; PGP AI/ML UT Austin</div>
+        <div class="bio">Exploring on-device inference, model optimization, and the intersection of ML engineering and Apple hardware.</div>
+        <div class="presenter-links">
+          <a href="https://github.com/nkthakur48" target="_blank">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a href="https://www.linkedin.com/in/nishantkthakur/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+          <a href="mailto:nthakur@adobe.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+            nthakur@adobe.com
+          </a>
+        </div>
+      </div>
+      <div class="presenter-card reveal reveal-delay-2">
+        <img class="presenter-avatar" src="https://ui-avatars.com/api/?name=Aishwarya+Mathuria&background=F5A623&color=0a0a0a&size=144&bold=true&font-size=0.4" alt="Aishwarya Mathuria">
+        <h3>Aishwarya Mathuria</h3>
+        <div class="role">Computer Scientist 2, Adobe</div>
+        <div class="edu">MS Data Science, Northwestern University</div>
+        <div class="bio">Passionate about data science, local ML pipelines, and making AI accessible without cloud dependencies.</div>
+        <div class="presenter-links">
+          <a href="https://github.com/aishwaryamathuria" target="_blank">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a href="https://www.linkedin.com/in/aishwaryamathuria/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+          <a href="mailto:mathuria@adobe.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+            mathuria@adobe.com
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Card 3: Feedback & Q&A -->
+<section class="card-section card-feedback" id="connect">
+  <div class="card-bg"></div>
+  <div class="card-content">
+    <div class="reveal">
+      <div class="section-label">Connect</div>
+      <div class="section-title">We'd love your input</div>
+      <div class="section-subtitle">Share feedback on the session or ask questions live.</div>
+    </div>
+    <div class="forms-grid">
+      <div class="form-card reveal reveal-delay-1">
+        <div class="form-icon feedback">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </div>
+        <h3>Session Feedback</h3>
+        <p>Help us improve by sharing your thoughts on the content, pacing, and demos.</p>
+        <a href="#" target="_blank" class="btn feedback-btn">
+          Share Feedback
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="form-card reveal reveal-delay-2">
+        <div class="form-icon qa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7dd47d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3>Ask a Question</h3>
+        <p>Curious about MLX, unified memory, local models, or anything else? Submit it and we'll answer live.</p>
+        <a href="#" target="_blank" class="btn qa-btn">
+          Ask Question
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── Card stacking parallax ──
+(function(){
+  const sections=document.querySelectorAll('.card-section');
+  let ticking=false;
+
+  function update(){
+    const sy=scrollY;
+    const wh=innerHeight;
+
+    sections.forEach((sec,i)=>{
+      const top=sec.offsetTop;
+      const scrolled=sy-top;
+
+      if(i<sections.length-1 && scrolled>0){
+        const progress=Math.min(scrolled/wh,1);
+        const scale=1-progress*0.06;
+        const radius=progress*24;
+        const bg=sec.querySelector('.card-bg');
+        bg.style.transform=`scale(${scale})`;
+        bg.style.borderRadius=radius+'px';
+        bg.style.opacity=1-progress*0.3;
+
+        const content=sec.querySelector('.card-content');
+        if(content){
+          content.style.transform=`scale(${scale})`;
+          content.style.opacity=1-progress*0.5;
+        }
+      } else {
+        const bg=sec.querySelector('.card-bg');
+        bg.style.transform='';
+        bg.style.borderRadius='';
+        bg.style.opacity='';
+        const content=sec.querySelector('.card-content');
+        if(content){
+          content.style.transform='';
+          content.style.opacity='';
+        }
+      }
+    });
+    ticking=false;
+  }
+
+  addEventListener('scroll',()=>{
+    if(!ticking){ticking=true;requestAnimationFrame(update)}
+  });
+  update();
+})();
+
+// ── Cursor glow ──
+(function(){
+  const blob=document.getElementById('cursor-blob');
+  let mx=0,my=0;
+  addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  function update(){
+    blob.style.transform=`translate(${mx-250}px,${my-250}px)`;
+    requestAnimationFrame(update);
+  }
+  update();
+})();
+
+// ── Scroll reveal ──
+(function(){
+  const els=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+  },{threshold:.12});
+  els.forEach(el=>obs.observe(el));
+})();
+
+// ── Nav hide on scroll ──
+(function(){
+  const nav=document.getElementById('navbar');
+  let last=0;
+  addEventListener('scroll',()=>{
+    const y=scrollY;
+    nav.classList.toggle('hidden',y>last&&y>80);
+    last=y;
+  });
+})();
+</script>
+</body>
+</html>
