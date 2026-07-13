@@ -262,11 +262,37 @@
   .form-card .btn.qa-btn:hover{box-shadow:0 8px 36px rgba(125,212,125,.25)}
 
   /* ── Responsive ── */
-  @media(max-width:768px){
+  @media(max-width:800px){
     .nav-links{display:none}
-    .card-section{padding:80px 20px}
-    .presenter-card,.form-card{padding:36px 28px}
-    .presenters-grid,.forms-grid{grid-template-columns:1fr}
+    .nav-inner{padding:10px 16px}
+    .nav-logo{font-size:1rem}
+    .card-section{padding:44px 16px}
+    .presenter-card,.form-card{padding:20px}
+    .presenters-grid,.forms-grid{grid-template-columns:1fr;gap:16px;margin-top:32px}
+
+    .presenter-card{
+      display:grid;
+      grid-template-columns:48px 1fr;
+      grid-template-rows:auto auto auto;
+      column-gap:16px;row-gap:0;
+      align-items:center;
+    }
+    .presenter-avatar{
+      width:48px;height:48px;margin-bottom:0;
+      grid-row:1/4;grid-column:1;align-self:start;margin-top:2px;
+    }
+    .presenter-card h3{font-size:1rem;grid-column:2}
+    .presenter-card .role{font-size:.72rem;grid-column:2;margin-top:2px}
+    .presenter-card .edu{font-size:.7rem;grid-column:2;margin-top:1px}
+    .presenter-card .bio{display:none}
+    .presenter-links{grid-column:1/-1;margin-top:14px;gap:6px}
+    .presenter-links a{font-size:.62rem;padding:5px 8px}
+    .presenter-links a svg{width:12px;height:12px}
+
+    .form-card h3{font-size:1.1rem}
+    .form-card p{font-size:.82rem}
+    .form-card .btn{padding:12px 20px;font-size:.82rem}
+    .section-label{font-size:.65rem;margin-bottom:10px}
   }
 
   /* ── Cursor glow ── */
